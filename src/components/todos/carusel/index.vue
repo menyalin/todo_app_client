@@ -1,5 +1,6 @@
 <template>
-  <div class="todos-wrapper">
+  <div class="todos-wrapper" :style="todosWrapperStyles">
+    {{ caruselWidth }}
     <transition-group
       class="todos"
       name="todos"
@@ -37,11 +38,16 @@ export default {
         width: this.itemWidth + "px",
       };
     },
+    todosWrapperStyles() {
+      return {
+        width: this.caruselWidth + "px",
+      };
+    },
     caruselStyles() {
       return {
         "margin-left": "-" + this.itemWidth + "px",
         "margin-right": "-" + this.itemWidth + "px",
-        // width: this.caruselWidth + this.itemWidth * 2 + "px",
+        width: this.caruselWidth + this.itemWidth * 2 + "px",
       };
     },
   },
@@ -50,10 +56,12 @@ export default {
 <style scoped>
 .todos-wrapper {
   overflow: hidden;
+  height: 100%;
 }
 .todos {
   display: flex;
   flex-wrap: nowrap;
+  justify-content: center;
 }
 .todos-move {
   transition: transform 0.7s;
@@ -69,11 +77,11 @@ export default {
 }
 .todos-enter-right {
   opacity: 0.7;
-  transform: translateX(200%);
+  transform: translateX(100%);
 }
 .todos-enter-left {
   opacity: 0.7;
-  transform: translateX(-200%);
+  transform: translateX(-100%);
 }
 .todos-enter-to {
   opacity: 1;

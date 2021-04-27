@@ -10,7 +10,9 @@
           <v-icon x-large> mdi-arrow-left-bold-circle </v-icon>
         </v-btn>
         <v-btn
-          @click="shiftDate({ count: -slidesOnScreen, slides: slidesOnScreen })"
+          @click="
+            shiftDate({ count: -slidesOnScreen + 2, slides: slidesOnScreen })
+          "
           icon
         >
           <v-icon> mdi-chevron-double-left </v-icon>
@@ -41,7 +43,9 @@
           <v-icon x-large> mdi-arrow-right-bold-circle </v-icon>
         </v-btn>
         <v-btn
-          @click="shiftDate({ count: slidesOnScreen, slides: slidesOnScreen })"
+          @click="
+            shiftDate({ count: slidesOnScreen - 2, slides: slidesOnScreen })
+          "
           icon
         >
           <v-icon> mdi-chevron-double-right </v-icon>
@@ -102,7 +106,7 @@ export default {
       this.setDate({ newDate, slides: this.slidesOnScreen });
     },
     resizeCarusel() {
-      this.caruselWidth = this.caruselEl.offsetWidth;
+      this.caruselWidth = window.screen.width - 130;
       this.$store.dispatch("initTodoDays", this.slidesOnScreen);
     },
     resetCurrentDate() {
