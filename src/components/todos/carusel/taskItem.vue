@@ -43,7 +43,7 @@
             {{ task.content }}
           </div>
         </template>
-        <span>{{ task.content }}</span>
+        <div class="tooltip-content">{{ task.content }}</div>
       </v-tooltip>
 
       <div class="btn-wrapper">
@@ -118,6 +118,10 @@ export default {
 };
 </script>
 <style scoped>
+.tooltip-content {
+  max-width: 400px;
+  white-space: pre-wrap;
+}
 .task-input {
   width: 100%;
   appearance: none;
