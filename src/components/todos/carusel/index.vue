@@ -1,6 +1,5 @@
 <template>
   <div class="todos-wrapper" :style="todosWrapperStyles">
-    {{ caruselWidth }}
     <transition-group
       class="todos"
       name="todos"

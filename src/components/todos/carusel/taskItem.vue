@@ -19,16 +19,11 @@
       @mouseenter="showBtn = true"
       @mouseleave="showBtn = false"
     >
-      <div
-        class="px-1"
-        :class="{
-          completed: task.completed,
-        }"
-      >
-        <v-icon color="primary" v-if="task.completed">
+      <div class="px-1">
+        <v-icon small color="primary" v-if="task.completed">
           mdi-check-circle
         </v-icon>
-        <v-icon color="primary" v-else>
+        <v-icon small color="primary" v-else>
           mdi-checkbox-blank-circle-outline
         </v-icon>
       </div>

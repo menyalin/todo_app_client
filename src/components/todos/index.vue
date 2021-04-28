@@ -9,14 +9,14 @@
         >
           <v-icon x-large> mdi-arrow-left-bold-circle </v-icon>
         </v-btn>
-        <v-btn
+        <!-- <v-btn
           @click="
             shiftDate({ count: -slidesOnScreen + 2, slides: slidesOnScreen })
           "
           icon
         >
           <v-icon> mdi-chevron-double-left </v-icon>
-        </v-btn>
+        </v-btn> -->
         <v-btn @click="resetCurrentDate" icon>
           <v-icon> mdi-home </v-icon>
         </v-btn>
@@ -24,7 +24,7 @@
       </side-panel>
     </div>
 
-    <div :style="{ 'z-index': '0' }" ref="carusel_wrapper">
+    <div :style="{ 'z-index': '0' }">
       <app-carusel
         :items="todosDays"
         :direction="slideDirection"
@@ -42,14 +42,14 @@
         >
           <v-icon x-large> mdi-arrow-right-bold-circle </v-icon>
         </v-btn>
-        <v-btn
+        <!-- <v-btn
           @click="
             shiftDate({ count: slidesOnScreen - 2, slides: slidesOnScreen })
           "
           icon
         >
           <v-icon> mdi-chevron-double-right </v-icon>
-        </v-btn>
+        </v-btn> -->
         <app-date-selector @changeCurrentDate="changeCurrentDate" />
       </side-panel>
     </div>
@@ -68,7 +68,6 @@ export default {
   name: "Todos_layout",
   data() {
     return {
-      caruselEl: null,
       caruselWidth: null,
     };
   },
@@ -94,7 +93,6 @@ export default {
   },
   mounted() {
     window.addEventListener("resize", this.resizeCarusel);
-    this.caruselEl = this.$refs.carusel_wrapper;
     this.resizeCarusel();
   },
   beforeDestroy() {
@@ -106,7 +104,7 @@ export default {
       this.setDate({ newDate, slides: this.slidesOnScreen });
     },
     resizeCarusel() {
-      this.caruselWidth = window.screen.width - 130;
+      this.caruselWidth = window.innerWidth - 147;
       this.$store.dispatch("initTodoDays", this.slidesOnScreen);
     },
     resetCurrentDate() {

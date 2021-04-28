@@ -6,11 +6,11 @@ const setTodoDays = (baseDate = "", dayCount = 1) => {
   let resArr = [];
   let prevDays;
   switch (true) {
-    case dayCount < 4:
-      prevDays = -1;
+    case dayCount <= 5:
+      prevDays = -2;
       break;
     default:
-      prevDays = -2;
+      prevDays = -3;
   }
   const tmpDate = moment(baseDate);
   tmpDate.add(prevDays, "day");
