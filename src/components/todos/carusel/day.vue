@@ -1,5 +1,5 @@
 <template>
-  <div :class="{ 'day-wrapper': true, today: isToday }">
+  <div :class="{ 'day-wrapper': true, today: isToday, 'gone-days': isGoneDay }">
     <header>
       <div class="display-2 text-center mt-2 pt-5 pb-2">
         {{ momentDate.format("dddd") }}
@@ -135,11 +135,17 @@ export default {
     dayTasks() {
       return this.$store.getters.getDayTasks(this.date);
     },
+    today() {
+      return moment();
+    },
     momentDate() {
       return moment(this.date);
     },
     isToday() {
-      return this.momentDate.isSame(moment(), "day");
+      return this.momentDate.isSame(this.today, "day");
+    },
+    isGoneDay() {
+      return this.momentDate.isBefore(this.today, "day");
     },
   },
 };
@@ -185,6 +191,10 @@ export default {
 }
 .today {
   color: darkblue;
+}
+.gone-days {
+  color: grey;
+  font-weight: 300;
 }
 .list-item {
   height: 30px;

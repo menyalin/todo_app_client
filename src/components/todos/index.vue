@@ -20,7 +20,6 @@
         <v-btn @click="resetCurrentDate" icon>
           <v-icon> mdi-home </v-icon>
         </v-btn>
-        el: {{ slidesOnScreen }} <br />
       </side-panel>
     </div>
 
