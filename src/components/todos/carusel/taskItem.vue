@@ -35,6 +35,7 @@
             class="content"
             :class="{
               completed: task.completed,
+              'content-hover': hover && !task.completed,
             }"
             ref="content_text"
             @mouseenter="contentHover"
@@ -69,6 +70,7 @@ export default {
       isEditable: false,
       inputValue: "",
       showTooltip: false,
+      hover: false,
     };
   },
   methods: {
@@ -82,11 +84,13 @@ export default {
     },
     contentHover() {
       const el = this.$refs.content_text;
+      this.hover = true;
       if (el.offsetWidth < el.scrollWidth) {
         this.showTooltip = true;
       }
     },
     closeTooltip() {
+      this.hover = false;
       this.showTooltip = false;
     },
     completeTask() {
@@ -124,6 +128,7 @@ export default {
 }
 .task-input {
   width: 100%;
+  font-size: 0.9rem;
   appearance: none;
   outline: 0;
   box-shadow: none;
@@ -143,9 +148,8 @@ export default {
   font-size: 0.9rem;
   flex: 1 1 100%;
 }
-.content :hover {
-  /* Многоточие */
-  font-size: 0.9rem;
+.content-hover {
+  font-weight: 600;
 }
 .btn-wrapper {
   width: 1.8rem;

@@ -203,10 +203,7 @@ export default {
   box-sizing: border-box;
   cursor: grab;
 }
-.list-item :hover {
-  font-weight: 600;
-  transition: font-weight 0.2s;
-}
+.list-item :hover 
 .main-section {
   height: 100%;
   background-image: repeating-linear-gradient(
