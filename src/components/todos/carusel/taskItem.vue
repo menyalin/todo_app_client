@@ -27,14 +27,24 @@
           mdi-checkbox-blank-circle-outline
         </v-icon>
       </div>
-      <div
-        class="content"
-        :class="{
-          completed: task.completed,
-        }"
-      >
-        {{ task.content }}
-      </div>
+
+      <v-tooltip bottom v-model="showTooltip">
+        <template v-slot:activator="{ attrs }">
+          <div
+            v-bind="attrs"
+            class="content"
+            :class="{
+              completed: task.completed,
+            }"
+            ref="content_text"
+            @mouseenter="contentHover"
+            @mouseleave="closeTooltip"
+          >
+            {{ task.content }}
+          </div>
+        </template>
+        <span>{{ task.content }}</span>
+      </v-tooltip>
 
       <div class="btn-wrapper">
         <v-icon
@@ -58,6 +68,7 @@ export default {
       showBtn: false,
       isEditable: false,
       inputValue: "",
+      showTooltip: false,
     };
   },
   methods: {
@@ -68,6 +79,15 @@ export default {
       this.$nextTick(() => {
         this.$refs.task_input.focus();
       });
+    },
+    contentHover() {
+      const el = this.$refs.content_text;
+      if (el.offsetWidth < el.scrollWidth) {
+        this.showTooltip = true;
+      }
+    },
+    closeTooltip() {
+      this.showTooltip = false;
     },
     completeTask() {
       this.changeTaskStatus({
@@ -120,12 +140,8 @@ export default {
   flex: 1 1 100%;
 }
 .content :hover {
-  position: absolute;
-  white-space: wrap; /* Отменяем перенос текста */
-  overflow: hidden; /* Обрезаем содержимое */
   /* Многоточие */
   font-size: 0.9rem;
-  flex: 1 1 100%;
 }
 .btn-wrapper {
   width: 1.8rem;
