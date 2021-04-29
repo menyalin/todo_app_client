@@ -82,6 +82,8 @@ export default {
   },
   data() {
     return {
+      timeoutId: null,
+      tooltipDelay: 700,
       showBtn: false,
       isEditable: false,
       inputValue: "",
@@ -106,12 +108,15 @@ export default {
       const el = this.$refs.content_text;
       this.hover = true;
       if (el.offsetWidth < el.scrollWidth) {
-        this.showTooltip = true;
+        this.timeoutId = setTimeout(() => {
+          this.showTooltip = true;
+        }, this.tooltipDelay);
       }
     },
     closeTooltip() {
       this.hover = false;
       this.showTooltip = false;
+      clearTimeout(this.timeoutId);
     },
     completeTask() {
       this.$nextTick(() => {
