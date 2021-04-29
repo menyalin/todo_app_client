@@ -30,6 +30,7 @@
         :slideCount="slidesOnScreen"
         :caruselWidth="caruselWidth"
       />
+      <app-task-form />
     </div>
 
     <div class="control-column">
@@ -58,12 +59,13 @@
 <script>
 import { mapGetters, mapMutations } from "vuex";
 import sidePanel from "./sidePanel.vue";
+import appTaskForm from "./taskForm";
 
 import appDateSelector from "./dateSelector";
 import appCarusel from "./carusel";
 
 export default {
-  components: { sidePanel, appCarusel, appDateSelector },
+  components: { sidePanel, appCarusel, appDateSelector, appTaskForm },
   name: "Todos_layout",
   data() {
     return {

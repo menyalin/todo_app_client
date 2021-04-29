@@ -1,6 +1,10 @@
 <template>
   <div class="row-wrapper">
-    <div v-if="isEditable">
+    <div v-if="isEditable" class="item-row">
+      <div class="px-1">
+        <v-icon small color="error"> mdi-pencil </v-icon>
+      </div>
+
       <input
         ref="task_input"
         @keyup.enter="saveItem"
@@ -8,18 +12,21 @@
         @keyup.esc="cancelEditItem"
         class="task-input"
         :value="inputValue"
-        autofocus
       />
     </div>
     <div
       v-else
-      @dblclick="editItem"
       class="item-row"
-      @click="completeTask"
       @mouseenter="showBtn = true"
       @mouseleave="showBtn = false"
     >
-      <div class="px-1">
+      <div
+        class="px-1"
+        @click.exact="completeTask"
+        :style="{
+          cursor: 'pointer',
+        }"
+      >
         <v-icon small color="primary" v-if="task.completed">
           mdi-check-circle
         </v-icon>
@@ -38,9 +45,12 @@
               'content-hover': hover && !task.completed,
             }"
             ref="content_text"
+            @dblclick="openForm"
+            @click.ctrl="editItem"
             @mouseenter="contentHover"
             @mouseleave="closeTooltip"
           >
+            <div></div>
             {{ task.content }}
           </div>
         </template>
@@ -62,8 +72,14 @@
   </div>
 </template>
 <script>
-import { mapActions } from "vuex";
+import { mapActions, mapMutations } from "vuex";
 export default {
+  props: {
+    task: {
+      type: Object,
+      required: true,
+    },
+  },
   data() {
     return {
       showBtn: false,
@@ -75,12 +91,16 @@ export default {
   },
   methods: {
     ...mapActions(["updateTaskContent", "changeTaskStatus", "removeTask"]),
+    ...mapMutations(["openTaskForm"]),
     editItem() {
       this.inputValue = this.task.content;
       this.isEditable = true;
       this.$nextTick(() => {
         this.$refs.task_input.focus();
       });
+    },
+    openForm() {
+      this.openTaskForm();
     },
     contentHover() {
       const el = this.$refs.content_text;
@@ -94,9 +114,11 @@ export default {
       this.showTooltip = false;
     },
     completeTask() {
-      this.changeTaskStatus({
-        taskId: this.task.id,
-        status: !this.task.completed,
+      this.$nextTick(() => {
+        this.changeTaskStatus({
+          taskId: this.task.id,
+          status: !this.task.completed,
+        });
       });
     },
     removeHandler() {
@@ -113,12 +135,6 @@ export default {
       });
     },
   },
-  props: {
-    task: {
-      type: Object,
-      required: true,
-    },
-  },
 };
 </script>
 <style scoped>
@@ -128,25 +144,29 @@ export default {
 }
 .task-input {
   width: 100%;
+  height: 100%;
   font-size: 0.9rem;
   appearance: none;
   outline: 0;
   box-shadow: none;
+  vertical-align: bottom;
 }
 .item-row {
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
-  align-content: center;
   width: 100%;
+  height: 100%;
 }
 .content {
   transition: all ease-in-out 0.3s;
-  white-space: nowrap; /* Отменяем перенос текста */
-  overflow: hidden; /* Обрезаем содержимое */
-  text-overflow: ellipsis; /* Многоточие */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   font-size: 0.9rem;
   flex: 1 1 100%;
+
+  vertical-align: bottom;
 }
 .content-hover {
   font-weight: 600;
@@ -157,6 +177,7 @@ export default {
 .row-wrapper {
   overflow: hidden;
   width: 100%;
+  height: 100%;
 }
 .completed {
   opacity: 0.4;

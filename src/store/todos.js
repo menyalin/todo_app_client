@@ -24,6 +24,7 @@ const setTodoDays = (baseDate = "", dayCount = 1) => {
 
 export default {
   state: {
+    isFormOfTaskVisible: false,
     slideDirection: null,
     moveableTaskId: null,
     currentDate: moment(),
@@ -31,49 +32,49 @@ export default {
     tasks: [
       {
         id: 1,
-        date: "2021-04-28",
+        date: "2021-04-30",
         content: "сделать список задач",
         completed: false,
         order: 0,
       },
       {
         id: 2,
-        date: "2021-04-28",
+        date: "2021-04-30",
         content: "сделать верстку списка",
         completed: false,
         order: 1,
       },
       {
         id: 3,
-        date: "2021-04-28",
+        date: "2021-04-30",
         content: "сделать заголовок дня",
         completed: true,
         order: 2,
       },
       {
         id: 4,
-        date: "2021-04-28",
+        date: "2021-04-30",
         content: "подключить локализацию",
         completed: false,
         order: 3,
       },
       {
         id: 5,
-        date: "2021-04-28",
+        date: "2021-04-30",
         content: "очередная задача 1",
         completed: false,
         order: 4,
       },
       {
         id: 6,
-        date: "2021-04-28",
+        date: "2021-04-30",
         content: "очередная задача 2",
         completed: false,
         order: 5,
       },
       {
         id: 7,
-        date: "2021-04-28",
+        date: "2021-04-30",
         content:
           "Очень очень длинный текст, какой-то очень сложной, практически не выполнимой задачи",
         completed: false,
@@ -138,6 +139,12 @@ export default {
       let editableTask = state.tasks.find((item) => item.id === taskId);
       editableTask.completed = status;
     },
+    openTaskForm(state) {
+      state.isFormOfTaskVisible = true;
+    },
+    closeTaskForm(state) {
+      state.isFormOfTaskVisible = false;
+    },
   },
   actions: {
     initTodoDays({ commit }, count) {
@@ -197,6 +204,7 @@ export default {
     },
   },
   getters: {
+    isFormOfTaskVisible: ({ isFormOfTaskVisible }) => isFormOfTaskVisible,
     currentDate: ({ currentDate }) => currentDate,
     todosDays: ({ todosDays }) => todosDays,
     moveableTaskId: ({ moveableTaskId }) => moveableTaskId,
