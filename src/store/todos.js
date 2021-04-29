@@ -48,7 +48,7 @@ export default {
         id: 3,
         date: "2021-04-30",
         content: "сделать заголовок дня",
-        completed: true,
+        completed: false,
         order: 2,
       },
       {
@@ -135,9 +135,9 @@ export default {
       state.tasks = state.tasks.filter((item) => !ids.includes(item.id));
       state.tasks.push(...updatedArray);
     },
-    changeTaskStatus(state, { taskId, status }) {
-      let editableTask = state.tasks.find((item) => item.id === taskId);
-      editableTask.completed = status;
+    changeTaskStatus(state, task) {
+      let editableTask = state.tasks.find((item) => item.id === task.id);
+      editableTask = task;
     },
     openTaskForm(state) {
       state.isFormOfTaskVisible = true;
@@ -151,9 +151,7 @@ export default {
       commit("initTodoDays", count);
     },
     addTask({ commit, getters }, { content, date }) {
-      const lastIndex = Math.max(
-        ...getters.getDayTasks(date).map((item) => item.order)
-      );
+      const lastIndex = getters.lastIndexInDay(date);
       const order = lastIndex !== -Infinity ? lastIndex + 1 : 0;
 
       const newTask = {
@@ -199,20 +197,41 @@ export default {
         commit("reorderTaskInDay", resArr);
       }
     },
-    changeTaskStatus({ commit }, payload) {
-      commit("changeTaskStatus", payload);
+    changeTaskStatus({ commit, getters }, { taskId, status }) {
+      let updatedTask = getters.taskById(taskId);
+      if (!updatedTask) throw new Error("Task not found");
+      if (status === true) {
+        updatedTask.order = getters.lastIndexInDay(updatedTask.date) + 1;
+      }
+      updatedTask.completed = status;
+      commit("changeTaskStatus", updatedTask);
     },
   },
   getters: {
     isFormOfTaskVisible: ({ isFormOfTaskVisible }) => isFormOfTaskVisible,
+
     currentDate: ({ currentDate }) => currentDate,
+
     todosDays: ({ todosDays }) => todosDays,
+
     moveableTaskId: ({ moveableTaskId }) => moveableTaskId,
+
     slideDirection: ({ slideDirection }) => slideDirection,
+
     allTasks: ({ tasks }) => tasks,
+
     getDayTasks: (state) => (date) =>
       state.tasks
         .filter((item) => item.date === date)
         .sort((a, b) => a.order - b.order),
+
+    lastIndexInDay: (state) => (date) =>
+      Math.max(
+        ...state.tasks
+          .filter((task) => task.date === date)
+          .map((task) => task.order)
+      ),
+
+    taskById: (state) => (id) => state.tasks.find((item) => item.id === id),
   },
 };
