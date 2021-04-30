@@ -83,7 +83,7 @@ export default {
   data() {
     return {
       timeoutId: null,
-      tooltipDelay: 700,
+      tooltipDelay: 300,
       showBtn: false,
       isEditable: false,
       inputValue: "",
@@ -109,7 +109,9 @@ export default {
       this.hover = true;
       if (el.offsetWidth < el.scrollWidth) {
         this.timeoutId = setTimeout(() => {
-          this.showTooltip = true;
+          this.$nextTick(() => {
+            this.showTooltip = true;
+          });
         }, this.tooltipDelay);
       }
     },
@@ -145,7 +147,7 @@ export default {
 <style scoped>
 .tooltip-content {
   max-width: 400px;
-  white-space: pre-wrap;
+  z-index: 10;
 }
 .task-input {
   width: 100%;
