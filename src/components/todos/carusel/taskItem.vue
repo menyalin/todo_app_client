@@ -49,7 +49,7 @@
         <div v-if="!showTooltip">
           {{ task.content }}
         </div>
-        <v-tooltip bottom v-else max-width="350px">
+        <v-tooltip bottom v-else max-width="350px" open-delay="300">
           <template v-slot:activator="{ on, attrs }">
             <div
               v-bind="attrs"
@@ -59,7 +59,7 @@
               {{ task.content }}
             </div>
           </template>
-          <span>{{ task.content }}</span>
+          <span class="text-subtitle-1">{{ task.content }}</span>
         </v-tooltip>
       </div>
 
