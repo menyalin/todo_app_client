@@ -4,7 +4,6 @@
       <div class="px-1">
         <v-icon small color="error"> mdi-pencil </v-icon>
       </div>
-
       <input
         ref="task_input"
         @keyup.enter="saveItem"
@@ -35,27 +34,34 @@
         </v-icon>
       </div>
 
-      <v-tooltip bottom v-model="showTooltip">
-        <template v-slot:activator="{ attrs }">
-          <div
-            v-bind="attrs"
-            class="content"
-            :class="{
-              completed: task.completed,
-              'content-hover': hover && !task.completed,
-            }"
-            ref="content_text"
-            @dblclick="openForm"
-            @click.ctrl="editItem"
-            @mouseenter="contentHover"
-            @mouseleave="closeTooltip"
-          >
-            <div></div>
-            {{ task.content }}
-          </div>
-        </template>
-        <div class="tooltip-content">{{ task.content }}</div>
-      </v-tooltip>
+      <div
+        :class="{
+          content: true,
+          completed: task.completed,
+          'content-hover': hover && !task.completed,
+        }"
+        ref="content_text"
+        @dblclick="openForm"
+        @click.ctrl="editItem"
+        @mouseenter="contentHover"
+        @mouseleave="hover = false"
+      >
+        <div v-if="!showTooltip">
+          {{ task.content }}
+        </div>
+        <v-tooltip bottom v-else max-width="350px">
+          <template v-slot:activator="{ on, attrs }">
+            <div
+              v-bind="attrs"
+              v-on="on"
+              :style="{ 'text-overflow': 'ellipsis', overflow: 'hidden' }"
+            >
+              {{ task.content }}
+            </div>
+          </template>
+          <span>{{ task.content }}</span>
+        </v-tooltip>
+      </div>
 
       <div class="btn-wrapper">
         <v-icon
@@ -79,6 +85,9 @@ export default {
       type: Object,
       required: true,
     },
+  },
+  mounted() {
+    this.setTooltipShow();
   },
   data() {
     return {
@@ -104,21 +113,15 @@ export default {
     openForm() {
       this.openTaskForm();
     },
-    contentHover() {
+    setTooltipShow() {
       const el = this.$refs.content_text;
-      this.hover = true;
       if (el.offsetWidth < el.scrollWidth) {
-        this.timeoutId = setTimeout(() => {
-          this.$nextTick(() => {
-            this.showTooltip = true;
-          });
-        }, this.tooltipDelay);
+        this.showTooltip = true;
       }
     },
-    closeTooltip() {
-      this.hover = false;
-      this.showTooltip = false;
-      clearTimeout(this.timeoutId);
+    contentHover() {
+      this.hover = true;
+      this.setTooltipShow();
     },
     completeTask() {
       this.$nextTick(() => {
@@ -145,10 +148,6 @@ export default {
 };
 </script>
 <style scoped>
-.tooltip-content {
-  max-width: 400px;
-  z-index: 10;
-}
 .task-input {
   width: 100%;
   height: 100%;
@@ -172,7 +171,6 @@ export default {
   text-overflow: ellipsis;
   font-size: 0.9rem;
   flex: 1 1 100%;
-
   vertical-align: bottom;
 }
 .content-hover {
