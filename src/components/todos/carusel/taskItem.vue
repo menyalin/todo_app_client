@@ -111,7 +111,7 @@ export default {
       });
     },
     openForm() {
-      this.openTaskForm(this.task.id);
+      this.openTaskForm(this.task._id);
     },
     setTooltipShow() {
       const el = this.$refs.content_text;
@@ -126,13 +126,13 @@ export default {
     completeTask() {
       this.$nextTick(() => {
         this.changeTaskStatus({
-          taskId: this.task.id,
+          taskId: this.task._id,
           status: !this.task.completed,
         });
       });
     },
     removeHandler() {
-      this.removeTask(this.task.id);
+      this.removeTask(this.task._id);
     },
     cancelEditItem() {
       this.isEditable = false;
@@ -140,7 +140,7 @@ export default {
     saveItem(e) {
       this.isEditable = false;
       this.updateTask({
-        id: this.task.id,
+        _id: this.task._id,
         content: e.target.value,
       });
     },

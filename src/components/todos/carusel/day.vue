@@ -14,16 +14,16 @@
         <transition-group name="list" tag="div" class="list">
           <div
             v-for="task in dayTasks"
-            :key="task.id"
+            :key="task._id"
             draggable
-            @dragstart="dragstartHandler($event, task.id, date)"
+            @dragstart="dragstartHandler($event, task._id, date)"
             @dragend="dragendHandler"
             @dragenter.stop.prevent="dragoverItemHandler($event, date, task)"
             @dragover.prevent
             :order="task.order"
             class="pa-0 list-item"
             :class="{
-              selected: task.id === moveableTaskId,
+              selected: task._id === moveableTaskId,
             }"
           >
             <app-task-item :task="task" />
@@ -97,13 +97,13 @@ export default {
       }
     },
 
-    dragstartHandler(e, id, date) {
-      this.setMoveableTaskId(id);
+    dragstartHandler(e, _id, date) {
+      this.setMoveableTaskId(_id);
       e.target.classList.add("selected");
       e.dataTransfer.effectAllowed = "move";
       e.dataTransfer.dropEffect = "move";
 
-      e.dataTransfer.setData("task", JSON.stringify({ date, id }));
+      e.dataTransfer.setData("task", JSON.stringify({ date, _id }));
     },
 
     dragendHandler(e) {
@@ -112,12 +112,12 @@ export default {
     },
 
     dragoverContainerHandler(e, date) {
-      this.editTaskDate({ id: this.moveableTaskId, date });
+      this.editTaskDate({ _id: this.moveableTaskId, date });
     },
 
     // eslint-disable-next-line no-unused-vars
     dragoverItemHandler(e, date, task) {
-      if (this.moveableTaskId === task.id) {
+      if (this.moveableTaskId === task._id) {
         return;
       }
       this.reorderTaskInDay({

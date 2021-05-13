@@ -7,13 +7,8 @@
       tag="div"
       :style="caruselStyles"
     >
-      <div
-        v-for="item in items"
-        :key="item.date"
-        class="item"
-        :style="itemStyles"
-      >
-        <app-day :date="item.date" />
+      <div v-for="day in days" :key="day.date" class="item" :style="itemStyles">
+        <app-day :date="day.date" />
       </div>
     </transition-group>
   </div>
@@ -21,7 +16,7 @@
 <script>
 import appDay from "./day";
 export default {
-  props: ["items", "direction", "slideCount", "caruselWidth"],
+  props: ["days", "direction", "slideCount", "caruselWidth"],
   components: {
     appDay,
   },

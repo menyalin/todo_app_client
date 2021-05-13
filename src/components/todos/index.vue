@@ -9,14 +9,6 @@
         >
           <v-icon x-large> mdi-arrow-left-bold-circle </v-icon>
         </v-btn>
-        <!-- <v-btn
-          @click="
-            shiftDate({ count: -slidesOnScreen + 2, slides: slidesOnScreen })
-          "
-          icon
-        >
-          <v-icon> mdi-chevron-double-left </v-icon>
-        </v-btn> -->
         <v-btn @click="resetCurrentDate" icon>
           <v-icon> mdi-home </v-icon>
         </v-btn>
@@ -25,7 +17,7 @@
 
     <div :style="{ 'z-index': '0' }">
       <app-carusel
-        :items="todosDays"
+        :days="todosDays"
         :direction="slideDirection"
         :slideCount="slidesOnScreen"
         :caruselWidth="caruselWidth"
@@ -42,14 +34,6 @@
         >
           <v-icon x-large> mdi-arrow-right-bold-circle </v-icon>
         </v-btn>
-        <!-- <v-btn
-          @click="
-            shiftDate({ count: slidesOnScreen - 2, slides: slidesOnScreen })
-          "
-          icon
-        >
-          <v-icon> mdi-chevron-double-right </v-icon>
-        </v-btn> -->
         <app-date-selector @changeCurrentDate="changeCurrentDate" />
       </side-panel>
     </div>

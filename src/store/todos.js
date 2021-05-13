@@ -1,5 +1,7 @@
 /* eslint-disable no-unused-vars */
 import moment from "moment";
+import api from "@/api";
+
 const dateFormat = "YYYY-MM-DD";
 
 const setTodoDays = (baseDate = "", dayCount = 1) => {
@@ -30,58 +32,7 @@ export default {
     editableTaskId: null,
     currentDate: moment(),
     todosDays: [],
-    tasks: [
-      {
-        id: 1,
-        date: "2021-05-06",
-        content: "сделать список задач",
-        completed: false,
-        order: 0,
-      },
-      {
-        id: 2,
-        date: "2021-05-06",
-        content: "сделать верстку списка",
-        completed: false,
-        order: 1,
-      },
-      {
-        id: 3,
-        date: "2021-05-06",
-        content: "сделать заголовок дня",
-        completed: false,
-        order: 2,
-      },
-      {
-        id: 4,
-        date: "2021-05-06",
-        content: "подключить локализацию",
-        completed: false,
-        order: 3,
-      },
-      {
-        id: 5,
-        date: "2021-05-06",
-        content: "очередная задача 1",
-        completed: false,
-        order: 4,
-      },
-      {
-        id: 6,
-        date: "2021-05-06",
-        content: "очередная задача 2",
-        completed: false,
-        order: 5,
-      },
-      {
-        id: 7,
-        date: "2021-05-06",
-        content:
-          "Очень очень длинный текст, какой-то очень сложной, практически не выполнимой задачи",
-        completed: false,
-        order: 6,
-      },
-    ],
+    tasks: [],
   },
   mutations: {
     initTodoDays(state, count) {
@@ -116,19 +67,19 @@ export default {
       tasks.push(newTask);
     },
     removeTask(state, taskId) {
-      state.tasks = state.tasks.filter((item) => item.id !== taskId);
+      state.tasks = state.tasks.filter((item) => item._id !== taskId);
     },
-    updateTaskContent({ tasks }, { id, content }) {
-      const tmp = tasks.find((item) => item.id === id);
+    updateTaskContent({ tasks }, { _id, content }) {
+      const tmp = tasks.find((item) => item._id === _id);
       tmp.content = content;
     },
-    updateTask({ tasks }, { id, content, completed }) {
-      let updatedTask = tasks.find((item) => item.id === id);
+    updateTask({ tasks }, { _id, content, completed }) {
+      let updatedTask = tasks.find((item) => item._id === _id);
       updatedTask.content = content;
       updatedTask.completed = completed;
     },
-    editTaskDate({ tasks }, { id, date, order }) {
-      let editableTask = tasks.find((item) => item.id === id);
+    editTaskDate({ tasks }, { _id, date, order }) {
+      let editableTask = tasks.find((item) => item._id === _id);
       editableTask.date = date;
       editableTask.order = order;
     },
@@ -136,12 +87,12 @@ export default {
       state.moveableTaskId = payload;
     },
     reorderTaskInDay(state, updatedArray) {
-      const ids = updatedArray.map((item) => item.id);
-      state.tasks = state.tasks.filter((item) => !ids.includes(item.id));
+      const ids = updatedArray.map((item) => item._id);
+      state.tasks = state.tasks.filter((item) => !ids.includes(item._id));
       state.tasks.push(...updatedArray);
     },
     changeTaskStatus(state, task) {
-      let editableTask = state.tasks.find((item) => item.id === task.id);
+      let editableTask = state.tasks.find((item) => item._id === task._id);
       editableTask = task;
     },
     openTaskForm(state, taskId) {
@@ -162,16 +113,20 @@ export default {
       const order = lastIndex !== -Infinity ? lastIndex + 1 : 0;
 
       const newTask = {
-        id: "id" + new Date().getTime(),
         date,
         content,
         completed: false,
         order,
       };
-      commit("addTask", newTask);
+      api.post("/tasks", newTask).then(({ data }) => {
+        commit("addTask", data.data);
+      });
     },
     removeTask({ commit }, taskId) {
-      commit("removeTask", taskId);
+      api
+        .delete(`/tasks/${taskId}`)
+        .then(commit("removeTask", taskId))
+        .catch((e) => console.log(e.message));
     },
     updateTask({ commit }, payload) {
       // {id, content, completed}
@@ -186,7 +141,7 @@ export default {
       commit("editTaskDate", payload);
     },
     reorderTaskInDay({ commit, getters }, { targetDate, taskId, targetOrder }) {
-      const movedTask = getters.allTasks.find((item) => item.id === taskId);
+      const movedTask = getters.allTasks.find((item) => item._id === taskId);
       let tmpArr = getters.getDayTasks(targetDate);
       let resArr = [];
       let ord = 0;
@@ -204,6 +159,7 @@ export default {
         commit("reorderTaskInDay", resArr);
       }
     },
+
     changeTaskStatus({ commit, getters }, { taskId, status }) {
       let updatedTask = getters.taskById(taskId);
       if (!updatedTask) throw new Error("Task not found");
@@ -229,9 +185,8 @@ export default {
 
     getDayTasks: (state) => (date) =>
       state.tasks
-        .filter((item) => item.date === date)
+        .filter((item) => moment(item.date).format(dateFormat) === date)
         .sort((a, b) => a.order - b.order),
-
     lastIndexInDay: (state) => (date) =>
       Math.max(
         ...state.tasks
@@ -239,7 +194,7 @@ export default {
           .map((task) => task.order)
       ),
 
-    taskById: (state) => (id) => state.tasks.find((item) => item.id === id),
+    taskById: (state) => (id) => state.tasks.find((item) => item._id === id),
     editableTaskId: ({ editableTaskId }) => editableTaskId,
   },
 };
