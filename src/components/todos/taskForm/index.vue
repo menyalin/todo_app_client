@@ -4,14 +4,13 @@
     persistent
     @click:outside="outsideClick"
     @keydown.esc="pressEsc"
-    max-width="500"
+    max-width="800"
   >
     <v-card>
-      <v-card-title class="headline"> form_task_title </v-card-title>
-
+      <v-card-title class="pb-6"> Edit task</v-card-title>
       <v-card-text>
-        <v-text-field label="task_content" hide-details="" />
-        <v-checkbox label="completed" />
+        <v-textarea outlined hide-details label="Content" v-model="content" />
+        <v-checkbox label="Completed" v-model="completed" />
       </v-card-text>
 
       <v-card-actions>
@@ -21,30 +20,76 @@
           Cancel
         </v-btn>
 
-        <v-btn color="green darken-1" text @click="saveHandler"> Save </v-btn>
+        <v-btn
+          color="green darken-1"
+          text
+          @click="saveHandler"
+          :disabled="submitDisabled"
+        >
+          Save
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
 <script>
-import { mapGetters, mapMutations } from "vuex";
+import { mapActions, mapGetters, mapMutations } from "vuex";
 export default {
   name: "taskForm",
   data() {
     return {
       dialog: true,
+      id: null,
+      content: null,
+      completed: null,
+      oldTask: null,
     };
   },
-  computed: {
-    ...mapGetters(["isFormOfTaskVisible"]),
+  watch: {
+    editableTaskId: function (id) {
+      if (id) {
+        this.setFields(id);
+      } else {
+        this.resetFields();
+      }
+    },
   },
+  computed: {
+    ...mapGetters(["isFormOfTaskVisible", "editableTaskId", "taskById"]),
+    submitDisabled() {
+      if (!this.id) return true;
+      if (
+        this.completed !== this.oldTask.completed ||
+        this.content !== this.oldTask.content
+      ) {
+        return false;
+      } else return true;
+    },
+  },
+
   methods: {
+    ...mapActions(["updateTask"]),
+    setFields(taskId) {
+      this.oldTask = this.taskById(taskId);
+      this.id = this.oldTask.id;
+      this.content = this.oldTask.content;
+      this.completed = this.oldTask.completed;
+    },
+    resetFields() {
+      this.id = null;
+      this.content = null;
+      this.completed = null;
+    },
     ...mapMutations(["closeTaskForm"]),
     cancelHandler() {
       this.closeTaskForm();
     },
     saveHandler() {
-      this.dialog = false;
+      this.updateTask({
+        id: this.id,
+        content: this.content,
+        completed: this.completed,
+      });
     },
     outsideClick() {
       this.closeTaskForm();

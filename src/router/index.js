@@ -1,20 +1,44 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
+import store from "../store";
 
 const todos = () => import("../components/todos");
-const taskForm = () => import("../components/todos/taskForm");
+
+const authLayout = () => import("@/components/auth/auth.layout.vue");
+const loginPage = () => import("@/components/auth/signIn.page.vue");
+const signUpPage = () => import("@/components/auth/signUp.page.vue");
+const mainLayout = () => import("@/components/main.layout.vue");
+
 Vue.use(VueRouter);
 
 const routes = [
   {
     path: "/",
-    name: "todos",
-    component: todos,
+    component: mainLayout,
+    children: [
+      {
+        path: "/",
+        name: "todos",
+        component: todos,
+      },
+    ],
+    meta: {
+      authRequired: true,
+    },
   },
   {
-    path: "/test",
-    name: "test",
-    component: taskForm,
+    path: "/auth",
+    component: authLayout,
+    children: [
+      {
+        path: "login",
+        component: loginPage,
+      },
+      {
+        path: "signup",
+        component: signUpPage,
+      },
+    ],
   },
 ];
 
@@ -22,6 +46,21 @@ const router = new VueRouter({
   mode: "history",
   base: process.env.BASE_URL,
   routes,
+});
+
+router.beforeEach((to, from, next) => {
+  if (
+    to.matched.some(
+      (record) => record.meta.authRequired && !store.getters.isLoggedIn
+    )
+  ) {
+    next({
+      path: "/auth/login",
+      query: { redirect: to.fullPath },
+    });
+  } else {
+    next();
+  }
 });
 
 export default router;

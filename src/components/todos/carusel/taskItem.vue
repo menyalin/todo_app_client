@@ -101,7 +101,7 @@ export default {
     };
   },
   methods: {
-    ...mapActions(["updateTaskContent", "changeTaskStatus", "removeTask"]),
+    ...mapActions(["updateTask", "changeTaskStatus", "removeTask"]),
     ...mapMutations(["openTaskForm"]),
     editItem() {
       this.inputValue = this.task.content;
@@ -111,7 +111,7 @@ export default {
       });
     },
     openForm() {
-      this.openTaskForm();
+      this.openTaskForm(this.task.id);
     },
     setTooltipShow() {
       const el = this.$refs.content_text;
@@ -139,7 +139,7 @@ export default {
     },
     saveItem(e) {
       this.isEditable = false;
-      this.updateTaskContent({
+      this.updateTask({
         id: this.task.id,
         content: e.target.value,
       });

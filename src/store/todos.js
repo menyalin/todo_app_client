@@ -27,6 +27,7 @@ export default {
     isFormOfTaskVisible: false,
     slideDirection: null,
     moveableTaskId: null,
+    editableTaskId: null,
     currentDate: moment(),
     todosDays: [],
     tasks: [
@@ -87,7 +88,6 @@ export default {
       state.todosDays = setTodoDays(state.currentDate, count);
     },
     shiftDate(state, { count, slides }) {
-      console.log("slides: ", slides);
       if (count > 0) state.slideDirection = "right";
       else state.slideDirection = "left";
 
@@ -122,6 +122,11 @@ export default {
       const tmp = tasks.find((item) => item.id === id);
       tmp.content = content;
     },
+    updateTask({ tasks }, { id, content, completed }) {
+      let updatedTask = tasks.find((item) => item.id === id);
+      updatedTask.content = content;
+      updatedTask.completed = completed;
+    },
     editTaskDate({ tasks }, { id, date, order }) {
       let editableTask = tasks.find((item) => item.id === id);
       editableTask.date = date;
@@ -139,11 +144,13 @@ export default {
       let editableTask = state.tasks.find((item) => item.id === task.id);
       editableTask = task;
     },
-    openTaskForm(state) {
+    openTaskForm(state, taskId) {
       state.isFormOfTaskVisible = true;
+      state.editableTaskId = taskId;
     },
     closeTaskForm(state) {
       state.isFormOfTaskVisible = false;
+      state.editableTaskId = null;
     },
   },
   actions: {
@@ -166,10 +173,10 @@ export default {
     removeTask({ commit }, taskId) {
       commit("removeTask", taskId);
     },
-    updateTaskContent({ commit }, { id, content }) {
-      if (id) {
-        commit("updateTaskContent", { id, content });
-      }
+    updateTask({ commit }, payload) {
+      // {id, content, completed}
+      commit("updateTask", payload);
+      commit("closeTaskForm");
     },
     editTaskDate({ commit, getters }, payload) {
       const lastIndex = Math.max(
@@ -233,5 +240,6 @@ export default {
       ),
 
     taskById: (state) => (id) => state.tasks.find((item) => item.id === id),
+    editableTaskId: ({ editableTaskId }) => editableTaskId,
   },
 };
