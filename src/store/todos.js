@@ -69,14 +69,13 @@ export default {
     removeTask(state, taskId) {
       state.tasks = state.tasks.filter((item) => item._id !== taskId);
     },
-    updateTaskContent({ tasks }, { _id, content }) {
-      const tmp = tasks.find((item) => item._id === _id);
-      tmp.content = content;
-    },
-    updateTask({ tasks }, { _id, content, completed }) {
-      let updatedTask = tasks.find((item) => item._id === _id);
-      updatedTask.content = content;
-      updatedTask.completed = completed;
+    // updateTaskContent({ tasks }, { _id, content }) {
+    //   const tmp = tasks.find((item) => item._id === _id);
+    //   tmp.content = content;
+    // },
+    updateTask({ tasks }, task) {
+      tasks = tasks.filter((item) => item._id !== task._id);
+      tasks.push(task);
     },
     editTaskDate({ tasks }, { _id, date, order }) {
       let editableTask = tasks.find((item) => item._id === _id);
@@ -128,18 +127,37 @@ export default {
         .then(commit("removeTask", taskId))
         .catch((e) => console.log(e.message));
     },
-    updateTask({ commit }, payload) {
+    updateTask({ commit, getters }, { _id, content, completed, date }) {
       // {id, content, completed}
-      commit("updateTask", payload);
+      let updatedTask = getters.taskById(_id);
+      if (!updatedTask) throw new Error("Task not found");
+      if (!updatedTask.completed && completed && date) {
+        // перекидываем в конец списка
+        updatedTask.order = getters.lastIndexInDay(date) + 1;
+      }
+      if (completed) updatedTask.completed = completed;
+      if (content) updatedTask.content = content;
+      if (date) updatedTask.date = date;
+      commit("updateTask", updatedTask);
       commit("closeTaskForm");
     },
-    editTaskDate({ commit, getters }, payload) {
-      const lastIndex = Math.max(
-        ...getters.getDayTasks(payload.date).map((item) => item.order)
-      );
-      payload.order = lastIndex !== -Infinity ? lastIndex + 1 : 0;
-      commit("editTaskDate", payload);
-    },
+    // editTaskDate({ commit, getters }, payload) {
+    //   const lastIndex = Math.max(
+    //     ...getters.getDayTasks(payload.date).map((item) => item.order)
+    //   );
+    //   payload.order = lastIndex !== -Infinity ? lastIndex + 1 : 0;
+    //   commit("editTaskDate", payload);
+    // },
+    // changeTaskStatus({ commit, getters }, { taskId, status }) {
+    //   let updatedTask = getters.taskById(taskId);
+    //   if (!updatedTask) throw new Error("Task not found");
+    //   if (status === true) {
+    //     updatedTask.order = getters.lastIndexInDay(updatedTask.date) + 1;
+    //   }
+    //   updatedTask.completed = status;
+    //   commit("changeTaskStatus", updatedTask);
+    // },
+
     reorderTaskInDay({ commit, getters }, { targetDate, taskId, targetOrder }) {
       const movedTask = getters.allTasks.find((item) => item._id === taskId);
       let tmpArr = getters.getDayTasks(targetDate);
@@ -158,16 +176,6 @@ export default {
         }
         commit("reorderTaskInDay", resArr);
       }
-    },
-
-    changeTaskStatus({ commit, getters }, { taskId, status }) {
-      let updatedTask = getters.taskById(taskId);
-      if (!updatedTask) throw new Error("Task not found");
-      if (status === true) {
-        updatedTask.order = getters.lastIndexInDay(updatedTask.date) + 1;
-      }
-      updatedTask.completed = status;
-      commit("changeTaskStatus", updatedTask);
     },
   },
   getters: {

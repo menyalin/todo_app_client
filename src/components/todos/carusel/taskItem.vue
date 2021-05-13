@@ -125,9 +125,10 @@ export default {
     },
     completeTask() {
       this.$nextTick(() => {
-        this.changeTaskStatus({
-          taskId: this.task._id,
-          status: !this.task.completed,
+        this.updateTask({
+          _id: this.task._id,
+          completed: !this.task.completed,
+          date: this.task.date,
         });
       });
     },

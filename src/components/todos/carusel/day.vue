@@ -78,12 +78,7 @@ export default {
   },
   methods: {
     ...mapMutations(["setMoveableTaskId"]),
-    ...mapActions([
-      "addTask",
-      "editTaskDate",
-      "reorderTaskInDay",
-      "editTaskDate",
-    ]),
+    ...mapActions(["addTask", "updateTask", "reorderTaskInDay"]),
     cancelEditItem() {
       this.editableTask = "";
     },
@@ -112,7 +107,7 @@ export default {
     },
 
     dragoverContainerHandler(e, date) {
-      this.editTaskDate({ _id: this.moveableTaskId, date });
+      this.updateTask({ _id: this.moveableTaskId, date });
     },
 
     // eslint-disable-next-line no-unused-vars
