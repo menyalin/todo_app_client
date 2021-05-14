@@ -17,6 +17,7 @@
             :key="task._id"
             draggable
             @dragstart="dragstartHandler($event, task._id, date)"
+            @drop.prevent="dropHandler(date)"
             @dragend="dragendHandler"
             @dragenter.stop.prevent="dragoverItemHandler($event, date, task)"
             @dragover.prevent
@@ -47,7 +48,6 @@
       </div>
       <div
         class="todo-empty-list"
-        @drop.prevent="dropHandler($event, date)"
         @dragenter.prevent="dragoverContainerHandler($event, date)"
         @dragover.prevent
         @click="setFocus"
@@ -78,7 +78,12 @@ export default {
   },
   methods: {
     ...mapMutations(["setMoveableTaskId"]),
-    ...mapActions(["addTask", "updateTask", "reorderTaskInDay"]),
+    ...mapActions([
+      "addTask",
+      "updateTask",
+      "reorderTaskInDay",
+      "updateDayTasks",
+    ]),
     cancelEditItem() {
       this.editableTask = "";
     },
@@ -121,8 +126,8 @@ export default {
         targetOrder: task.order,
       });
     },
-    dropHandler() {
-      return false;
+    dropHandler(date) {
+      this.updateDayTasks({ date });
     },
   },
   computed: {
@@ -154,7 +159,7 @@ export default {
   box-shadow: none;
 }
 .list-move {
-  transition: transform 0.3s;
+  transition: transform 0.1s;
 }
 .list-enter,
 .list-leave-to {

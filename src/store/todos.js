@@ -173,16 +173,15 @@ export default {
             resArr.push({ ...tmpArr[i], order: ord++ });
           }
         }
-        api
-          .put("/tasks/", resArr)
-          .then((res) => {
-            if (res.status === 202) commit("reorderTaskInDay", resArr);
-          })
-          .catch((e) => {
-            console.log(e);
-            commit("setError", e.message);
-          });
+        commit("reorderTaskInDay", resArr);
       }
+    },
+    updateDayTasks({ commit, getters }, { date }) {
+      const days = getters.getDayTasks(date);
+      api
+        .put("/tasks", days)
+        .then()
+        .catch((e) => commit("setError", e.message));
     },
   },
   getters: {
