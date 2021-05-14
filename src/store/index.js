@@ -100,6 +100,7 @@ export default new Vuex.Store({
     loading: ({ loading }) => loading,
     isLoggedIn: ({ token }) => !!token,
     token: ({ token }) => token,
+    user: ({ user }) => user,
   },
   modules: {
     todosModule,
