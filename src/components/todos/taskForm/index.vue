@@ -71,7 +71,7 @@ export default {
     ...mapActions(["updateTask"]),
     setFields(taskId) {
       this.oldTask = this.taskById(taskId);
-      this.id = this.oldTask.id;
+      this.id = this.oldTask._id;
       this.content = this.oldTask.content;
       this.completed = this.oldTask.completed;
     },
@@ -86,7 +86,7 @@ export default {
     },
     saveHandler() {
       this.updateTask({
-        id: this.id,
+        _id: this.id,
         content: this.content,
         completed: this.completed,
       });

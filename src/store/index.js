@@ -8,11 +8,7 @@ import api from "@/api";
 const initPlugin = (store) => {
   if (store.getters.token) {
     store.commit("setAppLoading", true);
-    Promise.all([
-      store.dispatch("getUserData"),
-      // store.dispatch("getCatalogGroups"),
-      // store.dispatch("getAllDetails"),
-    ])
+    Promise.all([store.dispatch("getTasks"), store.dispatch("getUserData")])
       .catch(() => {})
       .finally(() => store.commit("setAppLoading", false));
   }

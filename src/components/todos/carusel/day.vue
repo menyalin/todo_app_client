@@ -107,7 +107,7 @@ export default {
     },
 
     dragoverContainerHandler(e, date) {
-      this.updateTask({ _id: this.moveableTaskId, date });
+      this.updateTask({ _id: this.moveableTaskId, date, toBottom: true });
     },
 
     // eslint-disable-next-line no-unused-vars

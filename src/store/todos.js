@@ -24,6 +24,11 @@ const setTodoDays = (baseDate = "", dayCount = 1) => {
   return resArr;
 };
 
+const taskConvert = (task) => {
+  let newTask = { ...task, date: moment(task.date).format(dateFormat) };
+  return newTask;
+};
+
 export default {
   state: {
     isFormOfTaskVisible: false,
@@ -37,6 +42,9 @@ export default {
   mutations: {
     initTodoDays(state, count) {
       state.todosDays = setTodoDays(state.currentDate, count);
+    },
+    pushTasks(state, payload) {
+      state.tasks.push(...payload.map((item) => taskConvert(item)));
     },
     shiftDate(state, { count, slides }) {
       if (count > 0) state.slideDirection = "right";
@@ -69,18 +77,9 @@ export default {
     removeTask(state, taskId) {
       state.tasks = state.tasks.filter((item) => item._id !== taskId);
     },
-    // updateTaskContent({ tasks }, { _id, content }) {
-    //   const tmp = tasks.find((item) => item._id === _id);
-    //   tmp.content = content;
-    // },
     updateTask({ tasks }, task) {
       tasks = tasks.filter((item) => item._id !== task._id);
       tasks.push(task);
-    },
-    editTaskDate({ tasks }, { _id, date, order }) {
-      let editableTask = tasks.find((item) => item._id === _id);
-      editableTask.date = date;
-      editableTask.order = order;
     },
     setMoveableTaskId(state, payload) {
       state.moveableTaskId = payload;
@@ -107,10 +106,16 @@ export default {
     initTodoDays({ commit }, count) {
       commit("initTodoDays", count);
     },
+    getTasks({ commit }) {
+      api
+        .get("/tasks")
+        .then(({ data }) => {
+          commit("pushTasks", data.data);
+        })
+        .catch((e) => commit("setError", e.message));
+    },
     addTask({ commit, getters }, { content, date }) {
-      const lastIndex = getters.lastIndexInDay(date);
-      const order = lastIndex !== -Infinity ? lastIndex + 1 : 0;
-
+      const order = getters.lastIndexInDay(date) + 1;
       const newTask = {
         date,
         content,
@@ -118,7 +123,7 @@ export default {
         order,
       };
       api.post("/tasks", newTask).then(({ data }) => {
-        commit("addTask", data.data);
+        commit("addTask", taskConvert(data.data));
       });
     },
     removeTask({ commit }, taskId) {
@@ -127,36 +132,30 @@ export default {
         .then(commit("removeTask", taskId))
         .catch((e) => console.log(e.message));
     },
-    updateTask({ commit, getters }, { _id, content, completed, date }) {
+    updateTask(
+      { commit, getters },
+      { _id, content, completed, date, toBottom }
+    ) {
       // {id, content, completed}
       let updatedTask = getters.taskById(_id);
       if (!updatedTask) throw new Error("Task not found");
-      if (!updatedTask.completed && completed && date) {
-        // перекидываем в конец списка
+      if ((!updatedTask.completed && completed && date) || toBottom)
         updatedTask.order = getters.lastIndexInDay(date) + 1;
-      }
-      if (completed) updatedTask.completed = completed;
+
+      if (completed !== undefined) updatedTask.completed = completed;
       if (content) updatedTask.content = content;
       if (date) updatedTask.date = date;
-      commit("updateTask", updatedTask);
-      commit("closeTaskForm");
+
+      api
+        .put(`tasks/${_id}`, updatedTask)
+        .then(({ data }) => {
+          commit("updateTask", data.data);
+        })
+        .catch((e) => {
+          commit("setError", e.message);
+        });
+      if (getters.isFormOfTaskVisible) commit("closeTaskForm");
     },
-    // editTaskDate({ commit, getters }, payload) {
-    //   const lastIndex = Math.max(
-    //     ...getters.getDayTasks(payload.date).map((item) => item.order)
-    //   );
-    //   payload.order = lastIndex !== -Infinity ? lastIndex + 1 : 0;
-    //   commit("editTaskDate", payload);
-    // },
-    // changeTaskStatus({ commit, getters }, { taskId, status }) {
-    //   let updatedTask = getters.taskById(taskId);
-    //   if (!updatedTask) throw new Error("Task not found");
-    //   if (status === true) {
-    //     updatedTask.order = getters.lastIndexInDay(updatedTask.date) + 1;
-    //   }
-    //   updatedTask.completed = status;
-    //   commit("changeTaskStatus", updatedTask);
-    // },
 
     reorderTaskInDay({ commit, getters }, { targetDate, taskId, targetOrder }) {
       const movedTask = getters.allTasks.find((item) => item._id === taskId);
@@ -170,37 +169,41 @@ export default {
           if (tmpArr[i].order === targetOrder) {
             resArr.push({ ...movedTask, order: ord++ });
             resArr.push({ ...tmpArr[i], order: ord++ });
-          } else if (taskId !== tmpArr[i].id) {
+          } else if (taskId !== tmpArr[i]._id) {
             resArr.push({ ...tmpArr[i], order: ord++ });
           }
         }
-        commit("reorderTaskInDay", resArr);
+        api
+          .put("/tasks/", resArr)
+          .then((res) => {
+            if (res.status === 202) commit("reorderTaskInDay", resArr);
+          })
+          .catch((e) => {
+            console.log(e);
+            commit("setError", e.message);
+          });
       }
     },
   },
   getters: {
     isFormOfTaskVisible: ({ isFormOfTaskVisible }) => isFormOfTaskVisible,
-
     currentDate: ({ currentDate }) => currentDate,
-
     todosDays: ({ todosDays }) => todosDays,
-
     moveableTaskId: ({ moveableTaskId }) => moveableTaskId,
-
     slideDirection: ({ slideDirection }) => slideDirection,
-
     allTasks: ({ tasks }) => tasks,
-
     getDayTasks: (state) => (date) =>
       state.tasks
-        .filter((item) => moment(item.date).format(dateFormat) === date)
+        .filter((item) => item.date === date)
         .sort((a, b) => a.order - b.order),
-    lastIndexInDay: (state) => (date) =>
-      Math.max(
+    lastIndexInDay: (state) => (date) => {
+      let res = Math.max(
         ...state.tasks
           .filter((task) => task.date === date)
           .map((task) => task.order)
-      ),
+      );
+      return res !== -Infinity ? res : 0;
+    },
 
     taskById: (state) => (id) => state.tasks.find((item) => item._id === id),
     editableTaskId: ({ editableTaskId }) => editableTaskId,
