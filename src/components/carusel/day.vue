@@ -159,7 +159,7 @@ export default {
   box-shadow: none;
 }
 .list-move {
-  transition: transform 0.05s;
+  transition: transform 0.2s;
 }
 .list-enter,
 .list-leave-to {
@@ -180,7 +180,7 @@ export default {
 }
 .day-wrapper {
   display: flex;
-  padding: 10px;
+  padding: 3px;
   flex-direction: column;
   min-height: 560px;
   height: 100%;

@@ -15,19 +15,26 @@
         </v-btn>
       </template>
       <v-date-picker
-        v-model="date"
+        :value="date"
         no-title
         @input="changeDate"
+        color="primary"
       ></v-date-picker>
     </v-menu>
   </div>
 </template>
 <script>
+import moment from "moment";
 export default {
   name: "dateSelector",
+  props: {
+    date: {
+      type: String,
+      default: moment().format("YYYY-MM-DD"),
+    },
+  },
   data: () => ({
     dialog: false,
-    date: null,
   }),
   methods: {
     changeDate(val) {
