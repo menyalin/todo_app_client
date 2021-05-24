@@ -18,28 +18,43 @@
                 label="Name"
                 prepend-icon="mdi-account"
                 type="text"
-                v-model="name"
+                required
+                v-model.trim="$v.form.name.$model"
+                :error-messages="nameErrors"
+                @input="$v.form.name.$touch()"
+                @blur="$v.form.name.$touch()"
               />
               <v-text-field
                 label="Email"
                 prepend-icon="mdi-at"
                 type="email"
-                v-model="email"
+                v-model.trim="$v.form.email.$model"
+                :error-messages="emailErrors"
+                required
+                @input="$v.form.email.$touch()"
+                @blur="$v.form.email.$touch()"
               />
               <v-text-field
                 id="password"
-                v-model="password"
+                v-model="$v.form.password.$model"
                 label="Password"
                 prepend-icon="mdi-lock"
                 type="password"
+                :error-messages="passwordErrors"
+                required
+                @input="$v.form.password.$touch()"
+                @blur="$v.form.password.$touch()"
               />
               <v-text-field
                 id="password"
-                v-model="confirmPassword"
+                v-model="$v.form.confirmPassword.$model"
                 label="Confirm password"
                 prepend-icon="mdi-lock"
                 type="password"
-                disabled
+                :error-messages="confirmPasswordErrors"
+                required
+                @input="$v.form.confirmPassword.$touch()"
+                @blur="$v.form.confirmPassword.$touch()"
               />
             </v-card-text>
             <v-card-actions>
@@ -51,7 +66,7 @@
                 color="primary"
                 type="submit"
                 :loading="loading"
-                :disabled="loading"
+                :disabled="$v.form.$invalid"
               >
                 Registration
               </v-btn>
@@ -64,24 +79,78 @@
 </template>
 <script>
 import { mapActions } from "vuex";
+import { required, minLength, sameAs, email } from "vuelidate/lib/validators";
 export default {
   data: () => ({
     formTitle: "Registration form",
     loading: false,
-    email: "",
-    name: "",
-    password: "",
-    confirmPassword: "",
+    form: {
+      email: "",
+      name: "",
+      password: "",
+      confirmPassword: "",
+    },
     message: null,
     messageType: null,
     errorTimeoutMs: 5000,
   }),
+  validations: {
+    form: {
+      email: {
+        required,
+        email,
+      },
+      name: { required },
+      password: {
+        required,
+        minLength: minLength(4),
+      },
+      confirmPassword: {
+        required,
+        sameAs: sameAs("password"),
+      },
+    },
+  },
   beforeRouteEnter(to, from, next) {
     next((vm) => {
       if (vm.$store.getters.isLoggedIn) {
         vm.$router.push("/");
       }
     });
+  },
+  computed: {
+    isValidForm() {
+      return false;
+    },
+    nameErrors() {
+      const errors = [];
+      if (!this.$v.form.name.$dirty) return errors;
+      !this.$v.form.name.required && errors.push("Name is required");
+      return errors;
+    },
+    emailErrors() {
+      const errors = [];
+      if (!this.$v.form.email.$dirty) return errors;
+      !this.$v.form.email.email && errors.push("Must be valid e-mail");
+      !this.$v.form.email.required && errors.push("E-mail is required");
+      return errors;
+    },
+    passwordErrors() {
+      const errors = [];
+      if (!this.$v.form.password.$dirty) return errors;
+      !this.$v.form.password.minLength && errors.push("To short password");
+      !this.$v.form.password.required && errors.push("Password is required");
+      return errors;
+    },
+    confirmPasswordErrors() {
+      const errors = [];
+      if (!this.$v.form.confirmPassword.$dirty) return errors;
+
+      !this.$v.form.confirmPassword.required &&
+        errors.push("Confirm password is required");
+      !this.$v.form.confirmPassword.sameAs && errors.push("Password mismatch");
+      return errors;
+    },
   },
   methods: {
     ...mapActions(["signUp"]),
@@ -96,9 +165,9 @@ export default {
     submit() {
       this.loading = true;
       const newUser = {
-        email: this.email,
-        name: this.name,
-        password: this.password,
+        email: this.form.email,
+        name: this.form.name,
+        password: this.form.password,
       };
       this.signUp(newUser)
         .then((res) => {

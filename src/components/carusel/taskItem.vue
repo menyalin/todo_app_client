@@ -49,6 +49,7 @@
             @mouseenter="contentMouseEnter"
             @mouseleave="contentMouseLeave"
           >
+            <div></div>
             {{ task.content }}
           </div>
         </template>
