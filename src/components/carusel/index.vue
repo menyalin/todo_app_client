@@ -77,7 +77,7 @@ export default {
     this.initSlides();
   },
   computed: {
-    ...mapGetters(["getDayTasks"]),
+    ...mapGetters(["getDayTasks", "isFormOfTaskVisible"]),
     visibleSlides() {
       const startPos = this.isNeedShiftSlide
         ? this.leftSideHiddenSlides - 1
@@ -163,10 +163,10 @@ export default {
       this.caruselWidth = window.innerWidth - 107;
     },
     arrowKeyHandler(e) {
-      if (e.code === "ArrowLeft") {
+      if (e.code === "ArrowLeft" && !this.isFormOfTaskVisible) {
         this.leftShift();
       }
-      if (e.code === "ArrowRight") {
+      if (e.code === "ArrowRight" && !this.isFormOfTaskVisible) {
         this.rightShift();
       }
     },
