@@ -29,6 +29,12 @@ const taskConvert = (task) => {
   return newTask;
 };
 
+const getOldTask = (tasks) => {
+  return tasks
+    .filter((item) => !item.completed && moment().isAfter(item.date, "day"))
+    .reverse();
+};
+
 export default {
   state: {
     isFormOfTaskVisible: false,
@@ -46,6 +52,9 @@ export default {
     pushTasks(state, payload) {
       state.tasks.push(...payload.map((item) => taskConvert(item)));
     },
+    clearTasks(state) {
+      state.tasks = [];
+    },
     shiftDate(state, { count, slides }) {
       if (count > 0) state.slideDirection = "right";
       else state.slideDirection = "left";
@@ -59,7 +68,6 @@ export default {
     },
     setDate(state, { newDate, slides }) {
       if (!newDate) newDate = moment().format(dateFormat);
-
       if (state.currentDate.isAfter(newDate, "day"))
         state.slideDirection = "left";
       else if (state.currentDate.isBefore(newDate, "day"))
@@ -106,11 +114,23 @@ export default {
     initTodoDays({ commit }, count) {
       commit("initTodoDays", count);
     },
-    getTasks({ commit }) {
+    getTasks({ commit, dispatch }) {
       api
         .get("/tasks")
         .then(({ data }) => {
           commit("pushTasks", data.data);
+          const oldTasks = getOldTask(data.data);
+          if (oldTasks.length) {
+            for (let i = 0; i < oldTasks.length; i++) {
+              dispatch("reorderTaskInDay", {
+                targetDate: moment().format(dateFormat),
+                taskId: oldTasks[i]._id,
+                targetOrder: 0,
+              });
+              console.log("перекинул задачу");
+            }
+            dispatch("updateDayTasks", { date: moment().format(dateFormat) });
+          }
         })
         .catch((e) => commit("setError", e.message));
     },
@@ -155,7 +175,6 @@ export default {
         });
       if (getters.isFormOfTaskVisible) commit("closeTaskForm");
     },
-
     reorderTaskInDay({ commit, getters }, { targetDate, taskId, targetOrder }) {
       const movedTask = getters.allTasks.find((item) => item._id === taskId);
       let tmpArr = getters.getDayTasks(targetDate);
@@ -202,7 +221,6 @@ export default {
       );
       return res !== -Infinity ? res : 0;
     },
-
     taskById: (state) => (id) => state.tasks.find((item) => item._id === id),
     editableTaskId: ({ editableTaskId }) => editableTaskId,
   },

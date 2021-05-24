@@ -8,7 +8,7 @@ import api from "@/api";
 const initPlugin = (store) => {
   if (store.getters.token) {
     store.commit("setAppLoading", true);
-    Promise.all([store.dispatch("getTasks"), store.dispatch("getUserData")])
+    Promise.all([store.dispatch("getUserData")])
       .catch(() => {})
       .finally(() => store.commit("setAppLoading", false));
   }
@@ -46,10 +46,8 @@ export default new Vuex.Store({
       state.user = payload;
     },
     logOut(state) {
-      localStorage.removeItem("token");
       state.token = null;
       state.user = null;
-      router.push("/auth/login");
     },
   },
   actions: {
@@ -65,13 +63,21 @@ export default new Vuex.Store({
           .catch((e) => reject(e));
       });
     },
-    getUserData({ commit }) {
+    logOut({ commit }) {
+      localStorage.removeItem("token");
+      commit("logOut");
+      commit("clearTasks");
+      router.push("/auth/login");
+    },
+    getUserData({ commit, dispatch }) {
       return new Promise((resolve, reject) => {
         api
           .get("/auth")
           .then((res) => {
-            if (res.data.data) commit("setUser", res.data.data);
-            else commit("logOut");
+            if (res.data.data) {
+              commit("setUser", res.data.data);
+              dispatch("getTasks");
+            } else commit("logOut");
             resolve(res);
           })
           .catch((e) => {
