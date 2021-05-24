@@ -136,7 +136,6 @@ export default {
       { commit, getters },
       { _id, content, completed, date, toBottom }
     ) {
-      // {id, content, completed}
       let updatedTask = getters.taskById(_id);
       if (!updatedTask) throw new Error("Task not found");
       if ((!updatedTask.completed && completed && date) || toBottom)

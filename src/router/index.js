@@ -18,13 +18,13 @@ const routes = [
     component: mainLayout,
     children: [
       {
-        path: "/",
+        path: "/test",
         name: "todos",
         component: todos,
       },
       {
-        path: "/test",
-        name: "TestCarusel",
+        path: "/",
+        name: "carusel",
         component: carusel,
       },
     ],

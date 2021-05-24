@@ -14,8 +14,12 @@ export default {
 .side-panel {
   display: flex;
   flex-direction: column;
-  padding-top: 36px;
+  padding-top: 40px;
+  height: 100%;
   align-items: center;
   z-index: 25;
+}
+.side-panel > * {
+  margin: 4px;
 }
 </style>

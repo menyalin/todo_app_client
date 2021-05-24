@@ -1,6 +1,6 @@
 <template>
   <div :class="{ 'day-wrapper': true, today: isToday, 'gone-days': isGoneDay }">
-    <header>
+    <header ref="header">
       <div class="display-2 text-center mt-2 pt-5 pb-2">
         {{ momentDate.format("dddd") }}
       </div>
@@ -114,7 +114,6 @@ export default {
     dragoverContainerHandler(e, date) {
       this.updateTask({ _id: this.moveableTaskId, date, toBottom: true });
     },
-
     // eslint-disable-next-line no-unused-vars
     dragoverItemHandler(e, date, task) {
       if (this.moveableTaskId === task._id) {
@@ -182,7 +181,6 @@ export default {
   display: flex;
   padding: 3px;
   flex-direction: column;
-  min-height: 560px;
   height: 100%;
 }
 .list {

@@ -1,5 +1,5 @@
 <template>
-  <div class="row-wrapper">
+  <div class="row-wrapper" @mouseleave="hover = false">
     <div v-if="isEditable" class="item-row">
       <div class="px-1">
         <v-icon small color="error"> mdi-pencil </v-icon>
@@ -27,11 +27,9 @@
         }"
       >
         <v-icon small color="primary" v-if="task.completed">
-          mdi-check-circle
+          mdi-radiobox-marked
         </v-icon>
-        <v-icon small color="primary" v-else>
-          mdi-checkbox-blank-circle-outline
-        </v-icon>
+        <v-icon small color="primary" v-else> mdi-radiobox-blank </v-icon>
       </div>
 
       <div
@@ -43,12 +41,12 @@
         ref="content_text"
         @dblclick="openForm"
         @click.ctrl="editItem"
-        @mouseenter="contentHover"
-        @mouseleave="hover = false"
+        @mouseenter.prevent.stop="contentHover"
+        @mouseleave.prevent.stop="hover = false"
       >
-        <div v-if="!showTooltip">
+        <span v-if="!showTooltip">
           {{ task.content }}
-        </div>
+        </span>
         <v-tooltip bottom v-else max-width="350px" open-delay="300">
           <template v-slot:activator="{ on, attrs }">
             <div
@@ -56,6 +54,7 @@
               v-on="on"
               :style="{ 'text-overflow': 'ellipsis', overflow: 'hidden' }"
             >
+              <div></div>
               {{ task.content }}
             </div>
           </template>
@@ -86,9 +85,6 @@ export default {
       required: true,
     },
   },
-  mounted() {
-    this.setTooltipShow();
-  },
   data() {
     return {
       timeoutId: null,
@@ -117,7 +113,7 @@ export default {
       const el = this.$refs.content_text;
       if (el.offsetWidth < el.scrollWidth) {
         this.showTooltip = true;
-      }
+      } else this.showTooltip = false;
     },
     contentHover() {
       this.hover = true;
@@ -166,7 +162,7 @@ export default {
   height: 100%;
 }
 .content {
-  transition: all ease-in-out 0.3s;
+  /* transition: all ease-in-out 0.3s; */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -175,7 +171,7 @@ export default {
   vertical-align: bottom;
 }
 .content-hover {
-  font-weight: 600;
+  font-weight: 500;
 }
 .btn-wrapper {
   width: 1.8rem;
@@ -186,6 +182,6 @@ export default {
   height: 100%;
 }
 .completed {
-  opacity: 0.4;
+  opacity: 0.5;
 }
 </style>
