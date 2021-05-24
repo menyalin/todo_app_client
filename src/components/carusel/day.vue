@@ -39,6 +39,8 @@
           <input
             ref="new_task_input"
             @keyup.enter="addTaskHandler"
+            @keydown.left.stop
+            @keydown.right.stop
             @blur="addTaskHandler"
             @keyup.esc="cancelEditItem"
             class="task-input"

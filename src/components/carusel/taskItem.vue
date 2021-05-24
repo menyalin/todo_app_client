@@ -9,6 +9,8 @@
         @keyup.enter="saveItem"
         @blur="cancelEditItem"
         @keyup.esc="cancelEditItem"
+        @keydown.left.stop
+        @keydown.right.stop
         class="task-input"
         :value="inputValue"
       />
@@ -31,37 +33,29 @@
         </v-icon>
         <v-icon small color="primary" v-else> mdi-radiobox-blank </v-icon>
       </div>
-
-      <div
-        :class="{
-          content: true,
-          completed: task.completed,
-          'content-hover': hover && !task.completed,
-        }"
-        ref="content_text"
-        @dblclick="openForm"
-        @click.ctrl="editItem"
-        @mouseenter.prevent.stop="contentHover"
-        @mouseleave.prevent.stop="hover = false"
-      >
-        <span v-if="!showTooltip">
+      <v-tooltip bottom v-model="showTooltip">
+        <template v-slot:activator="{ on, attr }">
+          <div
+            v-bind="on"
+            v-on="attr"
+            :class="{
+              content: true,
+              completed: task.completed,
+              'content-hover': hover && !task.completed,
+            }"
+            ref="content_text"
+            @dblclick="openForm"
+            @click.ctrl="editItem"
+            @mouseenter="contentMouseEnter"
+            @mouseleave="contentMouseLeave"
+          >
+            {{ task.content }}
+          </div>
+        </template>
+        <div>
           {{ task.content }}
-        </span>
-        <v-tooltip bottom v-else max-width="350px" open-delay="300">
-          <template v-slot:activator="{ on, attrs }">
-            <div
-              v-bind="attrs"
-              v-on="on"
-              :style="{ 'text-overflow': 'ellipsis', overflow: 'hidden' }"
-            >
-              <div></div>
-              {{ task.content }}
-            </div>
-          </template>
-          <span class="text-subtitle-1">{{ task.content }}</span>
-        </v-tooltip>
-      </div>
-
+        </div>
+      </v-tooltip>
       <div class="btn-wrapper">
         <v-icon
           v-show="showBtn"
@@ -87,8 +81,6 @@ export default {
   },
   data() {
     return {
-      timeoutId: null,
-      tooltipDelay: 300,
       showBtn: false,
       isEditable: false,
       inputValue: "",
@@ -115,9 +107,12 @@ export default {
         this.showTooltip = true;
       } else this.showTooltip = false;
     },
-    contentHover() {
+    contentMouseEnter() {
       this.hover = true;
       this.setTooltipShow();
+    },
+    contentMouseLeave() {
+      this.showTooltip = false;
     },
     completeTask() {
       this.$nextTick(() => {
@@ -173,6 +168,7 @@ export default {
 .content-hover {
   font-weight: 500;
 }
+
 .btn-wrapper {
   width: 1.8rem;
 }
