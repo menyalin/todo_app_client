@@ -127,7 +127,6 @@ export default {
                 taskId: oldTasks[i]._id,
                 targetOrder: 0,
               });
-              console.log("перекинул задачу");
             }
             dispatch("updateDayTasks", { date: moment().format(dateFormat) });
           }
