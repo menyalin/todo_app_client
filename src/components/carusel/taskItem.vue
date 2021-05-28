@@ -179,6 +179,6 @@ export default {
   height: 100%;
 }
 .completed {
-  opacity: 0.5;
+  opacity: 0.3;
 }
 </style>

@@ -9,6 +9,32 @@
     <v-card>
       <v-card-title class="pb-6"> Edit task</v-card-title>
       <v-card-text>
+        <div>
+          <v-menu
+            v-model="dateMenu"
+            :close-on-content-click="false"
+            transition="scale-transition"
+            offset-y
+            max-width="290px"
+            min-width="auto"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-text-field
+                :value="date"
+                label="Task date"
+                prepend-icon="mdi-calendar"
+                readonly
+                v-bind="attrs"
+                v-on="on"
+              ></v-text-field>
+            </template>
+            <v-date-picker
+              v-model="date"
+              no-title
+              @input="dateMenu = false"
+            ></v-date-picker>
+          </v-menu>
+        </div>
         <v-textarea outlined hide-details label="Content" v-model="content" />
         <v-checkbox label="Completed" v-model="completed" />
       </v-card-text>
@@ -38,11 +64,13 @@ export default {
   name: "taskForm",
   data() {
     return {
+      dateMenu: false,
       dialog: true,
       id: null,
       content: null,
       completed: null,
       oldTask: null,
+      date: null,
     };
   },
   watch: {
@@ -60,7 +88,8 @@ export default {
       if (!this.id) return true;
       if (
         this.completed !== this.oldTask.completed ||
-        this.content !== this.oldTask.content
+        this.content !== this.oldTask.content ||
+        this.date !== this.oldTask.date
       ) {
         return false;
       } else return true;
@@ -74,11 +103,13 @@ export default {
       this.id = this.oldTask._id;
       this.content = this.oldTask.content;
       this.completed = this.oldTask.completed;
+      this.date = this.oldTask.date;
     },
     resetFields() {
       this.id = null;
       this.content = null;
       this.completed = null;
+      this.date = null;
     },
     ...mapMutations(["closeTaskForm"]),
     cancelHandler() {
@@ -89,6 +120,7 @@ export default {
         _id: this.id,
         content: this.content,
         completed: this.completed,
+        date: this.date,
       });
     },
     outsideClick() {

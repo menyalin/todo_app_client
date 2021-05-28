@@ -46,6 +46,11 @@
           @changeCurrentDate="initSlides"
           :date="baseDate.format(dateFormat)"
         />
+        <v-btn icon @click="toggleShowCompletedTasks">
+          <v-icon>
+            {{ hideCompletedTasks ? "mdi-eye-off" : "mdi-eye" }}
+          </v-icon>
+        </v-btn>
       </side-panel>
       <app-task-form />
     </div>
@@ -53,11 +58,11 @@
 </template>
 <script>
 import moment from "moment";
-import appDateSelector from "../todos/dateSelector.vue";
+import appDateSelector from "./dateSelector.vue";
 import sidePanel from "./sidePanel";
 import appTaskForm from "./taskForm";
 import appDay from "./day";
-import { mapGetters } from "vuex";
+import { mapGetters, mapMutations } from "vuex";
 
 export default {
   components: { appDateSelector, sidePanel, appTaskForm, appDay },
@@ -77,7 +82,7 @@ export default {
     this.initSlides();
   },
   computed: {
-    ...mapGetters(["getDayTasks", "isFormOfTaskVisible"]),
+    ...mapGetters(["getDayTasks", "isFormOfTaskVisible", "hideCompletedTasks"]),
     visibleSlides() {
       const startPos = this.isNeedShiftSlide
         ? this.leftSideHiddenSlides - 1
@@ -141,6 +146,7 @@ export default {
     window.addEventListener("keydown", this.arrowKeyHandler);
   },
   methods: {
+    ...mapMutations(["toggleShowCompletedTasks"]),
     initSlides(inputDate) {
       let date = null;
       if (

@@ -175,7 +175,7 @@ export default {
   transition: opacity 0.3s;
 }
 .selected {
-  opacity: 0.3;
+  opacity: 0.4;
   /* border: 1px black dotted;
   border-radius: 7px; */
 }

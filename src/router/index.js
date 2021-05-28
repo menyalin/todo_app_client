@@ -2,7 +2,6 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import store from "../store";
 
-const todos = () => import("../components/todos");
 const carusel = () => import("../components/carusel");
 
 const authLayout = () => import("@/components/auth/auth.layout.vue");
@@ -17,11 +16,6 @@ const routes = [
     path: "/",
     component: mainLayout,
     children: [
-      {
-        path: "/test",
-        name: "todos",
-        component: todos,
-      },
       {
         path: "/",
         name: "carusel",

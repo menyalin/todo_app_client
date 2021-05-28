@@ -4,31 +4,10 @@ import api from "@/api";
 
 const dateFormat = "YYYY-MM-DD";
 
-const setTodoDays = (baseDate = "", dayCount = 1) => {
-  let resArr = [];
-  let prevDays;
-  switch (true) {
-    case dayCount <= 5:
-      prevDays = -2;
-      break;
-    default:
-      prevDays = -3;
-  }
-  const tmpDate = moment(baseDate);
-  tmpDate.add(prevDays, "day");
-  for (let i = 0; i < dayCount; i++) {
-    resArr.push({
-      date: tmpDate.add(1, "day").format(dateFormat),
-    });
-  }
-  return resArr;
-};
-
 const taskConvert = (task) => {
   let newTask = { ...task, date: moment(task.date).format(dateFormat) };
   return newTask;
 };
-
 const getOldTask = (tasks) => {
   return tasks
     .filter((item) => !item.completed && moment().isAfter(item.date, "day"))
@@ -38,46 +17,21 @@ const getOldTask = (tasks) => {
 export default {
   state: {
     isFormOfTaskVisible: false,
-    slideDirection: null,
+    hideCompletedTasks: true,
     moveableTaskId: null,
     editableTaskId: null,
     currentDate: moment(),
-    todosDays: [],
     tasks: [],
   },
   mutations: {
-    initTodoDays(state, count) {
-      state.todosDays = setTodoDays(state.currentDate, count);
+    toggleShowCompletedTasks(state) {
+      state.hideCompletedTasks = !state.hideCompletedTasks;
     },
     pushTasks(state, payload) {
       state.tasks.push(...payload.map((item) => taskConvert(item)));
     },
     clearTasks(state) {
       state.tasks = [];
-    },
-    shiftDate(state, { count, slides }) {
-      if (count > 0) state.slideDirection = "right";
-      else state.slideDirection = "left";
-
-      state.currentDate.add(count, "day");
-
-      state.todosDays = setTodoDays(
-        state.currentDate.format(dateFormat),
-        slides
-      );
-    },
-    setDate(state, { newDate, slides }) {
-      if (!newDate) newDate = moment().format(dateFormat);
-      if (state.currentDate.isAfter(newDate, "day"))
-        state.slideDirection = "left";
-      else if (state.currentDate.isBefore(newDate, "day"))
-        state.slideDirection = "right";
-
-      state.currentDate = moment(newDate);
-      state.todosDays = setTodoDays(
-        state.currentDate.format(dateFormat),
-        slides
-      );
     },
     addTask({ tasks }, newTask) {
       tasks.push(newTask);
@@ -202,15 +156,15 @@ export default {
     },
   },
   getters: {
+    hideCompletedTasks: ({ hideCompletedTasks }) => hideCompletedTasks,
     isFormOfTaskVisible: ({ isFormOfTaskVisible }) => isFormOfTaskVisible,
-    currentDate: ({ currentDate }) => currentDate,
-    todosDays: ({ todosDays }) => todosDays,
     moveableTaskId: ({ moveableTaskId }) => moveableTaskId,
     slideDirection: ({ slideDirection }) => slideDirection,
     allTasks: ({ tasks }) => tasks,
     getDayTasks: (state) => (date) =>
       state.tasks
         .filter((item) => item.date === date)
+        .filter((item) => (state.hideCompletedTasks ? !item.completed : true))
         .sort((a, b) => a.order - b.order),
     lastIndexInDay: (state) => (date) => {
       let res = Math.max(
