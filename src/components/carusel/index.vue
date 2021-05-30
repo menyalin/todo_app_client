@@ -62,7 +62,7 @@ import appDateSelector from "./dateSelector.vue";
 import sidePanel from "./sidePanel";
 import appTaskForm from "./taskForm";
 import appDay from "./day";
-import { mapGetters, mapMutations } from "vuex";
+import { mapActions, mapGetters, mapMutations } from "vuex";
 
 export default {
   components: { appDateSelector, sidePanel, appTaskForm, appDay },
@@ -80,6 +80,14 @@ export default {
   },
   created() {
     this.initSlides();
+  },
+  watch: {
+    baseDate: {
+      deep: true,
+      handler: function (val) {
+        console.log(val.format(this.dateFormat));
+      },
+    },
   },
   computed: {
     ...mapGetters(["getDayTasks", "isFormOfTaskVisible", "hideCompletedTasks"]),
@@ -146,6 +154,7 @@ export default {
     window.addEventListener("keydown", this.arrowKeyHandler);
   },
   methods: {
+    ...mapActions(["changeStoreBaseDate"]),
     ...mapMutations(["toggleShowCompletedTasks"]),
     initSlides(inputDate) {
       let date = null;
@@ -161,6 +170,7 @@ export default {
         this.baseDate = moment();
       }
       this.slides = [];
+      this.changeStoreBaseDate(this.baseDate.format(this.dateFormat));
       for (let i = -this.leftSideHiddenSlides; i < this.slidesCount; i++) {
         this.slides.push(moment(date).add(i, "d"));
       }
@@ -201,6 +211,7 @@ export default {
     },
     leftShift() {
       this.baseDate.add(-1, "d");
+      this.changeStoreBaseDate(this.baseDate.format(this.dateFormat));
       const firstDay = moment(this.slides[0].format(this.dateFormat)).add(
         -1,
         "d"
@@ -210,6 +221,7 @@ export default {
     },
     rightShift() {
       this.baseDate.add(1, "d");
+      this.changeStoreBaseDate(this.baseDate.format(this.dateFormat));
       const lastDay = moment(
         this.slides[this.slides.length - 1].format(this.dateFormat)
       ).add(1, "d");

@@ -20,7 +20,7 @@ export default {
     hideCompletedTasks: true,
     moveableTaskId: null,
     editableTaskId: null,
-    currentDate: moment(),
+    globalBaseDate: moment(),
     tasks: [],
   },
   mutations: {
@@ -65,8 +65,13 @@ export default {
     },
   },
   actions: {
-    initTodoDays({ commit }, count) {
-      commit("initTodoDays", count);
+    // initTodoDays({ commit }, count) {
+    //   commit("initTodoDays", count);
+    // },
+    changeStoreBaseDate({ commit }, date) {
+      if (!!date && typeof date === "string") {
+        console.log("что-то делаем");
+      }
     },
     getTasks({ commit, dispatch }) {
       api
