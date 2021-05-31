@@ -81,14 +81,6 @@ export default {
   created() {
     this.initSlides();
   },
-  watch: {
-    baseDate: {
-      deep: true,
-      handler: function (val) {
-        console.log(val.format(this.dateFormat));
-      },
-    },
-  },
   computed: {
     ...mapGetters(["getDayTasks", "isFormOfTaskVisible", "hideCompletedTasks"]),
     visibleSlides() {

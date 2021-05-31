@@ -1,6 +1,9 @@
 /* eslint-disable no-unused-vars */
 import moment from "moment";
 import api from "@/api";
+import { clearConfigCache } from "prettier";
+
+const DAYS_COUNT = 30;
 
 const dateFormat = "YYYY-MM-DD";
 
@@ -12,6 +15,19 @@ const getOldTask = (tasks) => {
   return tasks
     .filter((item) => !item.completed && moment().isAfter(item.date, "day"))
     .reverse();
+};
+const dateLimits = (baseDate) => {
+  return {
+    startDate: moment(baseDate).add(-DAYS_COUNT, "days").format(dateFormat),
+    endDate: moment(baseDate)
+      .add(DAYS_COUNT * 1.5, "days")
+      .format(dateFormat),
+  };
+};
+const getDaysCountFromDate = (date) => {
+  if (!date && typeof date !== "string" && moment(date + "212132ds2").isValid)
+    throw new Error("bad format data");
+  return moment(date).valueOf() / (1000 * 60 * 60 * 24);
 };
 
 export default {
@@ -63,19 +79,30 @@ export default {
       state.isFormOfTaskVisible = false;
       state.editableTaskId = null;
     },
+    setGlobalBaseDate(state, date) {
+      state.globalBaseDate = moment(date);
+    },
   },
   actions: {
-    // initTodoDays({ commit }, count) {
-    //   commit("initTodoDays", count);
-    // },
-    changeStoreBaseDate({ commit }, date) {
-      if (!!date && typeof date === "string") {
-        console.log("что-то делаем");
+    changeStoreBaseDate({ commit, state, dispatch }, date) {
+      if (date && typeof date === "string") {
+        const newCountDays = getDaysCountFromDate(date);
+        const baseCountDays = getDaysCountFromDate(
+          state.globalBaseDate.format(dateFormat)
+        );
+        const diff = Math.abs(newCountDays - baseCountDays);
+        if (diff >= DAYS_COUNT / 1.3) {
+          commit("setGlobalBaseDate", date);
+          dispatch("getTasks");
+        }
       }
     },
-    getTasks({ commit, dispatch }) {
+    getTasks({ commit, dispatch, state }) {
+      commit("clearTasks");
       api
-        .get("/tasks")
+        .get("/tasks", {
+          params: dateLimits(state.globalBaseDate.format(dateFormat)),
+        })
         .then(({ data }) => {
           commit("pushTasks", data.data);
           const oldTasks = getOldTask(data.data);
