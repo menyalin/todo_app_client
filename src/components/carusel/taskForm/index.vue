@@ -37,6 +37,7 @@
         </div>
         <v-textarea outlined hide-details label="Content" v-model="content" />
         <v-checkbox label="Completed" v-model="completed" />
+        <v-select label="Repeat task" :items="repeatItems" v-model="repeat" />
       </v-card-text>
 
       <v-card-actions>
@@ -71,6 +72,22 @@ export default {
       completed: null,
       oldTask: null,
       date: null,
+      endDate: null,
+      repeat: null,
+      repeatItems: [
+        {
+          text: "Never",
+          value: "none",
+        },
+        {
+          text: "Every day",
+          value: "day",
+        },
+        {
+          text: "Every weak",
+          value: "weak",
+        },
+      ],
     };
   },
   watch: {
@@ -89,7 +106,9 @@ export default {
       if (
         this.completed !== this.oldTask.completed ||
         this.content !== this.oldTask.content ||
-        this.date !== this.oldTask.date
+        this.date !== this.oldTask.date ||
+        this.repeat !== this.oldTask.repeat ||
+        this.endDate !== this.oldTask.endDate
       ) {
         return false;
       } else return true;
@@ -104,12 +123,16 @@ export default {
       this.content = this.oldTask.content;
       this.completed = this.oldTask.completed;
       this.date = this.oldTask.date;
+      this.repeat = this.oldTask.repeat;
+      this.endDate = this.oldTask.endDate;
     },
     resetFields() {
       this.id = null;
       this.content = null;
       this.completed = null;
       this.date = null;
+      this.repeat = null;
+      this.endDate = null;
     },
     ...mapMutations(["closeTaskForm"]),
     cancelHandler() {
@@ -121,6 +144,8 @@ export default {
         content: this.content,
         completed: this.completed,
         date: this.date,
+        repeat: this.repeat,
+        endDate: this.endDate,
       });
     },
     outsideClick() {
