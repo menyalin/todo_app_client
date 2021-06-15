@@ -3,7 +3,7 @@ import moment from "moment";
 import api from "@/api";
 import { clearConfigCache } from "prettier";
 
-const DAYS_COUNT = 30;
+const DAYS_COUNT = 6;
 
 const dateFormat = "YYYY-MM-DD";
 
@@ -25,7 +25,7 @@ const dateLimits = (baseDate) => {
   };
 };
 const getDaysCountFromDate = (date) => {
-  if (!date && typeof date !== "string" && moment(date + "212132ds2").isValid)
+  if (!date && typeof date !== "string" && moment(date).isValid)
     throw new Error("bad format data");
   return moment(date).valueOf() / (1000 * 60 * 60 * 24);
 };
@@ -49,8 +49,10 @@ export default {
     clearTasks(state) {
       state.tasks = [];
     },
-    addTask({ tasks }, newTask) {
-      tasks.push(newTask);
+    addTasks({ tasks }, newTasks) {
+      newTasks.forEach((item) => {
+        tasks.push(taskConvert(item));
+      });
     },
     removeTask(state, taskId) {
       state.tasks = state.tasks.filter((item) => item._id !== taskId);
@@ -91,7 +93,7 @@ export default {
           state.globalBaseDate.format(dateFormat)
         );
         const diff = Math.abs(newCountDays - baseCountDays);
-        if (diff >= DAYS_COUNT / 1.3) {
+        if (diff >= DAYS_COUNT / 1.5) {
           commit("setGlobalBaseDate", date);
           dispatch("getTasks");
         }
@@ -119,17 +121,22 @@ export default {
         })
         .catch((e) => commit("setError", e.message));
     },
-    addTask({ commit, getters }, { content, date }) {
+    addTask({ commit, getters, state }, { content, date }) {
       const order = getters.lastIndexInDay(date) + 1;
       const newTask = {
         date,
         content,
         completed: false,
         order,
+        repeat: "days",
       };
-      api.post("/tasks", newTask).then(({ data }) => {
-        commit("addTask", taskConvert(data.data));
-      });
+      api
+        .post("/tasks", newTask, {
+          params: dateLimits(state.globalBaseDate.format(dateFormat)),
+        })
+        .then(({ data }) => {
+          commit("addTasks", data.data);
+        });
     },
     removeTask({ commit }, taskId) {
       api

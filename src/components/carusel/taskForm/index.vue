@@ -46,7 +46,6 @@
         <v-btn color="green darken-1" text @click="cancelHandler">
           Cancel
         </v-btn>
-
         <v-btn
           color="green darken-1"
           text
@@ -73,7 +72,7 @@ export default {
       oldTask: null,
       date: null,
       endDate: null,
-      repeat: null,
+      repeat: "none",
       repeatItems: [
         {
           text: "Never",
@@ -81,11 +80,23 @@ export default {
         },
         {
           text: "Every day",
-          value: "day",
+          value: "days",
         },
         {
-          text: "Every weak",
-          value: "weak",
+          text: "Every week",
+          value: "weeks",
+        },
+        {
+          text: "Every month",
+          value: "months",
+        },
+        {
+          text: "Every month",
+          value: "months",
+        },
+        {
+          text: "Every year",
+          value: "years",
         },
       ],
     };

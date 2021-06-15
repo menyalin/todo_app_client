@@ -74,14 +74,15 @@ export default new Vuex.Store({
         api
           .get("/auth")
           .then((res) => {
+            console.log(res);
             if (res.data.data) {
               commit("setUser", res.data.data);
               dispatch("getTasks");
-            } else commit("logOut");
+            } else dispatch("logOut");
             resolve(res);
           })
           .catch((e) => {
-            if (e.response.status === 401) commit("logOut");
+            if (e.response.status === 401) dispatch("logOut");
             reject(e);
           });
       });

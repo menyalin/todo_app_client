@@ -1,7 +1,6 @@
 /* eslint-disable no-unused-vars */
 <template>
   <div class="todos-row" :style="rowStyles">
-    <!-- left bar -->
     <div class="control_bar">
       <side-panel>
         <v-btn @click="leftShift" icon color="primary">
@@ -33,7 +32,7 @@
         <app-day :date="slide.format(dateFormat)" />
       </div>
     </transition-group>
-    <!-- right bar -->
+
     <div class="control_bar">
       <side-panel>
         <v-btn @click="rightShift" icon color="primary">
@@ -227,6 +226,7 @@ export default {
 .todos-row {
   display: grid;
   grid-template-columns: 45px 1fr 45px;
+  width: 100%;
 }
 .carusel-move {
   transition: transform 0.5s;
@@ -240,7 +240,7 @@ export default {
 }
 .carusel_container {
   margin: 0 auto;
-  overflow: clip;
+  overflow: hidden;
   position: relative;
   height: 100%;
 }
