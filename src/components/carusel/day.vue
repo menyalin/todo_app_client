@@ -40,7 +40,7 @@
             ref="new_task_input"
             @keydown.left.stop
             @keydown.right.stop
-            @change="addTaskHandler"
+            @change.prevent="addTaskHandler"
             @keyup.esc="cancelEditItem"
             class="task-input"
             :value="editableTask"
@@ -92,13 +92,12 @@ export default {
       this.$refs.new_task_input.focus();
     },
     addTaskHandler(e) {
-      if (e.target.value.trim()) {
-        this.addTask({ content: e.target.value.trim(), date: this.date });
-        this.editableTask = "";
-      }
-      this.$nextTick(() => {
-        this.$refs["new_task_input"].blur();
-      });
+      // if (e.target.value.trim()) {
+      //   this.addTask({ content: e.target.value.trim(), date: this.date });
+      //   this.editableTask = "";
+      // }
+      this.addTask({ content: e.target.value.trim(), date: this.date });
+      this.editableTask = null;
     },
 
     dragstartHandler(e, _id, date) {

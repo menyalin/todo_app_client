@@ -50,9 +50,13 @@ export default {
       state.tasks = [];
     },
     addTasks({ tasks }, newTasks) {
-      newTasks.forEach((item) => {
-        tasks.push(taskConvert(item));
-      });
+      if (Array.isArray(newTasks)) {
+        newTasks.forEach((item) => {
+          tasks.push(taskConvert(item));
+        });
+      } else {
+        tasks.push(taskConvert(newTasks));
+      }
     },
     removeTask(state, taskId) {
       state.tasks = state.tasks.filter((item) => item._id !== taskId);
