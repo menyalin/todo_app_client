@@ -42,6 +42,7 @@
             @keydown.left.stop
             @keydown.right.stop
             @blur="addTaskHandler"
+            @change="addTaskHandler"
             @keyup.esc="cancelEditItem"
             class="task-input"
             :value="editableTask"
