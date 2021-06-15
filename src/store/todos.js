@@ -121,14 +121,13 @@ export default {
         })
         .catch((e) => commit("setError", e.message));
     },
-    addTask({ commit, getters, state }, { content, date }) {
+    addTask({ commit, getters, state }, { content, date, repeat }) {
       const order = getters.lastIndexInDay(date) + 1;
       const newTask = {
         date,
         content,
         completed: false,
         order,
-        repeat: "days",
       };
       api
         .post("/tasks", newTask, {

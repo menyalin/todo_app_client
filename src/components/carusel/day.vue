@@ -38,11 +38,9 @@
         >
           <input
             ref="new_task_input"
-            @keyup.enter="addTaskHandler"
             @keydown.left.stop
             @keydown.right.stop
-            @blur="addTaskHandler"
-            @change="addTaskHandler"
+            @change.prevent="addTaskHandler"
             @keyup.esc="cancelEditItem"
             class="task-input"
             :value="editableTask"
@@ -98,6 +96,7 @@ export default {
         this.addTask({ content: e.target.value.trim(), date: this.date });
         this.editableTask = "";
       }
+      this.$refs.new_task_input.blur();
     },
 
     dragstartHandler(e, _id, date) {

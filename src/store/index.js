@@ -74,7 +74,6 @@ export default new Vuex.Store({
         api
           .get("/auth")
           .then((res) => {
-            console.log(res);
             if (res.data.data) {
               commit("setUser", res.data.data);
               dispatch("getTasks");
