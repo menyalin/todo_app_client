@@ -97,7 +97,7 @@ export default {
         this.editableTask = "";
       }
       this.$nextTick(() => {
-        this.$refs.new_task_input.blur();
+        this.$refs["new_task_input"].blur();
       });
     },
 
